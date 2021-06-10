@@ -45,6 +45,8 @@ library(ggplot2)
 
 ui <- fluidPage(
   title = "Origami Data",
+tags$h2("Five Find-Outers: Origami Lesson Analysis. How did it go?"),
+tags$p("After our online lesson, we decided to use shiny as a platform to show the class the results of the information we were able to gather."),
   sidebarLayout(
     sidebarPanel(
       #1. Demographics data
@@ -99,5 +101,19 @@ server <- function(input, output) {
 }
 
 shinyApp(ui, server)
+```
+
+```{r}
+library(tidyverse)
+
+#first table
+p <- ggplot(origamiSurvey,aes(fill=gender,
+                              x=countryIn))+
+  geom_bar(position = "stack") +
+  ggtitle("Where is our class and how is it composed?")
+
+mytable1 <- p + coord_flip()
+
+mytable1
 ```
 
