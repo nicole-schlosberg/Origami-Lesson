@@ -17,7 +17,7 @@ origamiSurvey <- read.csv("OrigamiSurveyUpdate.csv")
 origamiSurvey<-select(origamiSurvey, 1:20)
 #rename columns
 colnames(origamiSurvey) <- c("timestamp", "id", "gender", "countryIn", "HoursPerWeekStudying", "HoursPerWeekExtracurriculars", "technology", "internetSpeed", "enjoyArtsAndCrafts", "findsOrigamiRelaxing", "engagingLesson", "aDifferentFormat", "clearInstructions", "motivation", "completionToWhere", "whyStopped", "bestFormat", "reasonsNotToTake", "butterfly", "frog")
-#Make all the names the same (capitals)
+#Make all the Countries the same (capitals and spelling)
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "U.S", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "USA.", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "USA", "US")
@@ -26,14 +26,148 @@ origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "United States"
 origamiSurvey$countryIn <- str_to_upper(origamiSurvey$countryIn)
 #remove the timestamp
 origamiSurvey <- origamiSurvey[,-1]
-
-#update the frog and butterfly column to being Yes or No (correct or incorrect) rather than the link to the picture
-
+#Make all the Internet Speeds simpler
+origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Fast. Enough to smoothly  stream video, quickly download large files, etc.", "Fast")
+origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Lightning Speed. Fastest possible connection for all sorts of projects and activities.", "Lightning Speed")
+origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Moderate. Enough to get online, checkin, and comfortably browse the web.", "Moderate")
 ```
 
 
 #Creating Interactive Visualization
+
+#https://shiny.rstudio.com/reference/shiny/latest/tabsetPanel.html
+```{r}
+library(shiny)
+library(ggplot2)
+
+#Two tabs: 1. Demographics and 2. Predictions
+#1. Demographics data (holds all the graphs to display country, gender, and if got correct?)
+#2. tab set up for prediction (calling this dataset pred for now but change based on true name)
+#3. How was the lesson
+
+ui <- fluidPage(
+  title = "Origami Data",
+tags$h2("Five Find-Outers: Origami Lesson Analysis. How did it go?"),
+tags$p("After our online lesson, we decided to use shiny as a platform to show the class the results of the information we were able to gather."),
+  sidebarLayout(
+    sidebarPanel(
+      #1. Demographics data
+      conditionalPanel( 
+        'input.data === "Demographics"',
+        helpText("Check out some graphs")
+      ),
+      #2. tab set up for prediction
+      conditionalPanel( 
+        'input.data === "Predictions"',
+        helpText("Here are our predictions")
+      ),
+      #3. How was the lesson
+      conditionalPanel( 
+        'input.data === "Summary"',
+        helpText("How Was The Lesson?")
+      )
+    ),
+    mainPanel(
+      tabsetPanel(
+        id = 'data',
+          tabPanel("Demographics", plotOutput("demo")),
+          tabPanel("Predictions", plotOutput("pred")),
+          tabPanel("Summary", plotOutput("summ"))
+      )
+    )
+  )
+)
+
+server <- function(input, output) {
+ 
+  output$demo <- renderPlot({
+
+  })
+  
+  output$pred <- renderPlot({
+
+  })
+  
+  output$summ <- renderPlot({
+
+  })
+  
+}
+
+shinyApp(ui, server)
+```
+
+
+#Making graphs
+```{r}
+library(tidyverse)
+
+#first table
+p <- ggplot(origamiSurvey,aes(fill=gender,
+                              x=countryIn))+
+  geom_bar(position = "stack") +
+  ggtitle("Where is our class and how is it composed?")
+
+mytable1 <- p + coord_flip()
+
+mytable1
+```
+
+
+
+
+
+
+#Below is testing code ignore
+
+#Testing using a dashboard to have tabs
+```{r}
+ library(shiny)
+ library(bs4Dash)
+
+   ui <- dashboardPage(
+    header = dashboardHeader("Origami Data"),
+    sidebar = dashboardSidebar(),
+    controlbar = dashboardControlbar(),
+    footer = dashboardFooter("Five Find-Outers: Origami Lesson Analysis. How did it go?"),
+    title = "Origami Data",
+    body = dashboardBody(
+     # manually inserted panels
+     tabsetPanel(
+      id = "tabcard",
+      tabPanel(
+       title = "Demographics", 
+       plotOutput("demo")
+      ),
+      tabPanel(
+       title = "Predictions", 
+       tableOutput("pred")
+      )
+     
+      )
+    )
+   )
+   server = function(input, output) {
+    
+   observeEvent(input$plot, {
+     tabsetPanel(
+       inputId = "plot", output$renderPlot
+     )
+   })
+   
+   observeEvent(input$table, {
+     updateTabsetPanel(
+       session, 
+       inputId = "table", 
+     )
+   })
+  
+   }
+ shinyApp(ui, server)
+```
+
 #https://github.com/rstudio/shiny
+#Do not use this one
 ```{r}
 library(shiny)
 library(ggplot2)
@@ -62,8 +196,8 @@ tags$p("After our online lesson, we decided to use shiny as a platform to show t
       ),
       #3. How was the lesson
       conditionalPanel( 
-        'input.dataset === "Ratings"',
-        checkboxGroupInput("rate", "How Was The Lesson?",
+        'input.dataset === "Summary"',
+        checkboxGroupInput("Summary", "How Was The Lesson?",
                            names(origamiSurvey[,c(8:19)]), selected = NA)
       )
     ),
@@ -76,7 +210,7 @@ tags$p("After our online lesson, we decided to use shiny as a platform to show t
         #2. What the output for prediction tab will be (might want to use the table)
         tabPanel("Predictions", DT::dataTableOutput("mytable2")),
         #3. What the output for lesson rating tab will be (some form of graphs--same as demo tab)
-        tabPanel("Ratings", DT::dataTableOutput("mytable3"))
+        tabPanel("Summary", verbatimTextOutput("summary"))
       )
     )
   )
@@ -95,7 +229,7 @@ server <- function(input, output) {
   })
   
   #3. Output for ratings tab
-  output$mytable1 <- DT::renderDataTable({ #should change from table output based on tabPanel
+  output$mytable3 <- DT::renderDataTable({ #should change from table output based on tabPanel
     DT::datatable(origamiSurvey[, input$rate, drop = FALSE])
   })
 }
@@ -103,17 +237,4 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-```{r}
-library(tidyverse)
-
-#first table
-p <- ggplot(origamiSurvey,aes(fill=gender,
-                              x=countryIn))+
-  geom_bar(position = "stack") +
-  ggtitle("Where is our class and how is it composed?")
-
-mytable1 <- p + coord_flip()
-
-mytable1
-```
 
