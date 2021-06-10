@@ -1,0 +1,103 @@
+---
+title: "Origami"
+author: "Nicole Schlosberg"
+date: "6/9/2021"
+output: html_document
+---
+
+#Importing and tidying up the Origami data
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+
+origamiSurvey <- read.csv("OrigamiSurvey.csv")
+
+#remove unwanted rows
+origamiSurvey<-select(origamiSurvey, 1:20)
+#rename columns
+colnames(origamiSurvey) <- c("timestamp", "id", "gender", "countryIn", "HoursPerWeekStudying", "HoursPerWeekExtracurriculars", "technology", "internetSpeed", "enjoyArtsAndCrafts", "findsOrigamiRelaxing", "engagingLesson", "aDifferentFormat", "clearInstructions", "motivation", "completionToWhere", "whyStopped", "bestFormat", "reasonsNotToTake", "butterfly", "frog")
+#Make all the names the same (capitals)
+origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "U.S", "US")
+origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "USA.", "US")
+origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "USA", "US")
+origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "US.", "US")
+origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "United States", "US")
+origamiSurvey$countryIn <- str_to_upper(origamiSurvey$countryIn)
+#remove the timestamp
+origamiSurvey <- origamiSurvey[,-1]
+
+#update the frog and butterfly column to being Yes or No (correct or incorrect) rather than the link to the picture
+
+```
+
+
+#Creating Interactive Visualization
+#https://github.com/rstudio/shiny
+```{r}
+library(shiny)
+library(ggplot2)
+
+#Two tabs: 1. Demographics and 2. Predictions
+#1. Demographics data (holds all the graphs to display country, gender, and if got correct?)
+#2. tab set up for prediction (calling this dataset pred for now but change based on true name)
+#3. How was the lesson
+
+ui <- fluidPage(
+  title = "Origami Data",
+  sidebarLayout(
+    sidebarPanel(
+      #1. Demographics data
+      conditionalPanel( 
+        'input.dataset === "Demographics"',
+        checkboxGroupInput("demo", "Select What You Would Like To See",
+                           names(origamiSurvey[,-c(8:17)]), selected = NA)
+      ),
+      #2. tab set up for prediction
+      conditionalPanel( 
+        'input.dataset === "Predictions"',
+        helpText("Here are our predictions")
+      ),
+      #3. How was the lesson
+      conditionalPanel( 
+        'input.dataset === "Ratings"',
+        checkboxGroupInput("rate", "How Was The Lesson?",
+                           names(origamiSurvey[,c(8:19)]), selected = NA)
+      )
+    ),
+    
+    mainPanel(
+      tabsetPanel(
+        id = 'dataset',
+        #1. What the output for demographics tab will be (should change from table) also might nest in more graphs to this tab -- look into how to do that
+        tabPanel("Demographics", DT::dataTableOutput("mytable1")), 
+        #2. What the output for prediction tab will be (might want to use the table)
+        tabPanel("Predictions", DT::dataTableOutput("mytable2")),
+        #3. What the output for lesson rating tab will be (some form of graphs--same as demo tab)
+        tabPanel("Ratings", DT::dataTableOutput("mytable3"))
+      )
+    )
+  )
+)
+
+server <- function(input, output) {
+
+  #1. Output for demographics tab
+  output$mytable1 <- DT::renderDataTable({ #should change from table output based on tabPanel
+    DT::datatable(origamiSurvey[, input$demo, drop = FALSE])
+  })
+  
+  #2. Output for prediction tab
+  output$mytable2 <- DT::renderDataTable({
+    DT::datatable(pred, options = list(orderClasses = TRUE)) #pred = whatever dataset we use
+  })
+  
+  #3. Output for ratings tab
+  output$mytable1 <- DT::renderDataTable({ #should change from table output based on tabPanel
+    DT::datatable(origamiSurvey[, input$rate, drop = FALSE])
+  })
+}
+
+shinyApp(ui, server)
+```
+
