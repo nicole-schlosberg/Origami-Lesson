@@ -1,6 +1,6 @@
 # Origami-Lesson
 
-OrigamiSurvey.csv is the data downloaded from the Google Survey.
+OrigamiSurvey.csv is the data downloaded from the Google Survey.  
 Origami.Rmd cleans the data and begins building the shiny app
 
 # Codebook
