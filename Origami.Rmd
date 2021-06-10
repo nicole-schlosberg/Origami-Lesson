@@ -11,7 +11,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 
-origamiSurvey <- read.csv("OrigamiSurvey.csv")
+origamiSurvey <- read.csv("OrigamiSurveyUpdate.csv")
 
 #remove unwanted rows
 origamiSurvey<-select(origamiSurvey, 1:20)
