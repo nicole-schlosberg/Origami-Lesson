@@ -1,8 +1,8 @@
 # Origami-Lesson
 
-OrigamiSurvey.csv is the data downloaded from the Google Survey. 
-OrigamiSurveyUpdate.csv is the data but with the frog and butterfly columns updated
-Origami.Rmd cleans the data and begins building the shiny app
+OrigamiSurvey.csv is the data downloaded from the Google Survey.   
+OrigamiSurveyUpdate.csv is the data but with the frog and butterfly columns updated  
+Origami.Rmd cleans the data and begins building the shiny app  
 
 # Codebook
 
@@ -10,8 +10,8 @@ timestamp - "Timestamp"
 id - "TC ID"  
 gender - "What is your gender?"  
 countryIn - "Which country are you taking your online classes from presently?"  
-HoursPerWeekStudying - "On average, how many hours do you spend ﻿on your academic per week?"  
-HoursPerWeekExtracurriculars - "On average, how many hours do you spend ﻿on extracurricular activities per week?"  
+HoursPerWeekStudying - "On average, how many hours do you spend on your academic per week?"  
+HoursPerWeekExtracurriculars - "On average, how many hours do you spend on extracurricular activities per week?"  
 technology - "What technology do you use for online learning?"  
 internetSpeed - What is your connection speed while taking online classes?"  
 enjoyArtsAndCrafts - "Do you enjoy arts and crafts activities?"  
