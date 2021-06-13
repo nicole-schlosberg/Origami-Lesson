@@ -24,12 +24,15 @@ origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "USA", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "US.", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "United States", "US")
 origamiSurvey$countryIn <- str_to_upper(origamiSurvey$countryIn)
+#Fill in Unknown for students who did not share their country
+origamiSurvey[1,4] <- "Unknown"
 #remove the timestamp
 origamiSurvey <- origamiSurvey[,-1]
 #Make all the Internet Speeds simpler
 origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Fast. Enough to smoothly  stream video, quickly download large files, etc.", "Fast")
 origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Lightning Speed. Fastest possible connection for all sorts of projects and activities.", "Lightning Speed")
 origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Moderate. Enough to get online, checkin, and comfortably browse the web.", "Moderate")
+
 ```
 
 
