@@ -37,7 +37,9 @@ origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Moderate. Enou
 
 #https://shiny.rstudio.com/reference/shiny/latest/tabsetPanel.html
 ```{r}
+#install.packages("shinydashboard")
 library(shiny)
+library(shinydashboard)
 library(ggplot2)
 
 #Two tabs: 1. Demographics and 2. Predictions
@@ -54,12 +56,15 @@ tags$p("After our online lesson, we decided to use shiny as a platform to show t
       #1. Demographics data
       conditionalPanel( 
         'input.data === "Demographics"',
-        helpText("Check out some graphs")
+        helpText("
+        Whats all the fuzz about? - As an educational excersise, we decided to teach to our fellow classmate a class of origami in oder to evaluate how 'teachable' this particular skills are in the context of online education.This section contains some relevant information on the people that participated in our class")
       ),
       #2. tab set up for prediction
       conditionalPanel( 
         'input.data === "Predictions"',
-        helpText("Here are our predictions")
+        helpText("Decision tree algorithm:
+Basics and visual representation .-
+The algorithm of decision tree models works by repeatedly partitioning the data into multiple sub-spaces, so that the outcomes in each final sub-space is as homogeneous as possible. This approach is technically called recursive partitioning.In the following Rmarkdown you will see the entire process of data wrangling, analysis and models outcome.")
       ),
       #3. How was the lesson
       conditionalPanel( 
@@ -70,28 +75,53 @@ tags$p("After our online lesson, we decided to use shiny as a platform to show t
     mainPanel(
       tabsetPanel(
         id = 'data',
-          tabPanel("Demographics", plotOutput("demo")),
-          tabPanel("Predictions", plotOutput("pred")),
-          tabPanel("Summary", plotOutput("summ"))
+          tabPanel("Demographics",
+                   plotOutput("demo"),
+                   plotOutput("pie"),
+                   plotOutput("pie2"),
+                   plotOutput("pie3"),
+                   plotOutput("pie4")
+),
+          tabPanel("Predictions", htmlOutput("rmark")),
+          tabPanel("Summary",plotOutput("sum"))
       )
     )
-  )
+    )
 )
 
 server <- function(input, output) {
- 
+  getPage<-function() {
+    return(includeHTML("Origami_Prediction.html"))
+  }
+  
+  output$rmark<-renderUI({getPage()})
+  
   output$demo <- renderPlot({
+    mytable1
+
+  })
+  
+    output$pie <- renderPlot({
+    myTable2
+
+  })
+    
+        output$pie2 <- renderPlot({
+    myTable3
+
+  })
+        
+        output$pie3 <- renderPlot({
+    myTable4
+
+  })
+       output$pie4 <- renderPlot({
+    myTable5
 
   })
   
   output$pred <- renderPlot({
-
   })
-  
-  output$summ <- renderPlot({
-
-  })
-  
 }
 
 shinyApp(ui, server)
@@ -111,6 +141,152 @@ p <- ggplot(origamiSurvey,aes(fill=gender,
 mytable1 <- p + coord_flip()
 
 mytable1
+
+
+# Create test data.
+data <- data.frame(
+  category=c("+15 hours", "10-15 hours","5-10 hours", "0-5 hours"),
+  count=c(6, 7, 3, 6)
+)
+ 
+ 
+# Compute percentages
+data$fraction <- data$count / sum(data$count)
+
+# Compute the cumulative percentages (top of each rectangle)
+data$ymax <- cumsum(data$fraction)
+
+# Compute the bottom of each rectangle
+data$ymin <- c(0, head(data$ymax, n=-1))
+
+# Compute label position
+data$labelPosition <- (data$ymax + data$ymin) / 2
+
+# Compute a good label
+data$label <- paste0(data$category, "\n value: ", data$count)
+
+# Make the plot
+myTable2 <- ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
+  geom_rect() +
+  geom_text( x=2, aes(y=labelPosition, label=label, color=category), size=5) + # x here controls label position (inner / outer)
+  scale_fill_brewer(palette=8) +
+  scale_color_brewer(palette=8) +
+  coord_polar(theta="y") +
+  xlim(c(-1, 4)) +
+  theme_void() +
+  theme(legend.position = "none") +
+  ggtitle("On average, how many hours do you spend on your academic per week?")
+
+
+myTable2
+
+
+data2 <- data.frame(
+  category=c("+15 hours", "10-15 hours","5-10 hours", "0-5 hours"),
+  count=c(6, 3, 6, 7)
+)
+ 
+
+# Compute percentages
+data2$fraction <- data2$count / sum(data2$count)
+
+# Compute the cumulative percentages (top of each rectangle)
+data2$ymax <- cumsum(data2$fraction)
+
+# Compute the bottom of each rectangle
+data2$ymin <- c(0, head(data2$ymax, n=-1))
+
+# Compute label position
+data2$labelPosition <- (data2$ymax + data2$ymin) / 2
+
+# Compute a good label
+data2$label <- paste0(data2$category, "\n value: ", data2$count)
+
+# Make the plot
+myTable3 <- ggplot(data2, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
+  geom_rect() +
+  geom_text( x=2, aes(y=labelPosition, label=label, color=category), size=5) + # x here controls label position (inner / outer)
+  scale_fill_brewer(palette=9) +
+  scale_color_brewer(palette=9) +
+  coord_polar(theta="y") +
+  xlim(c(-1, 4)) +
+  theme_void() +
+  theme(legend.position = "none") +
+  ggtitle("On average, how many hours do you spend on extracurricular activities per week?")
+
+myTable3
+
+data4 <- data.frame(
+  category=c("I love it!", "Dont","Im Alright", "3-5 a year"),
+  count=c(12, 1, 8, 1)
+)
+ 
+ 
+
+# Compute percentages
+data4$fraction <- data4$count / sum(data4$count)
+
+# Compute the cumulative percentages (top of each rectangle)
+data4$ymax <- cumsum(data4$fraction)
+
+# Compute the bottom of each rectangle
+data4$ymin <- c(0, head(data4$ymax, n=-1))
+
+# Compute label position
+data4$labelPosition <- (data3$ymax + data4$ymin) / 2
+
+# Compute a good label
+data4$label <- paste0(data4$category, "\n value: ", data4$count)
+
+# Make the plot
+myTable5 <- ggplot(data4, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
+  geom_rect() +
+  geom_text( x=2, aes(y=labelPosition, label=label, color=category), size=5) + # x here controls label position (inner / outer)
+  scale_fill_brewer(palette=11) +
+  scale_color_brewer(palette=11) +
+  coord_polar(theta="y") +
+  xlim(c(-1, 4)) +
+  theme_void() +
+  theme(legend.position = "none") +
+  ggtitle("Do you enjoy arts and crafts activities?")
+
+myTable5
+
+data3 <-   data.frame(
+  category=c("Lightening Speed", "Fast","Moderate"),
+  count=c(2, 12, 8)
+)
+ 
+
+# Compute percentages
+data3$fraction <- data3$count / sum(data3$count)
+
+# Compute the cumulative percentages (top of each rectangle)
+data3$ymax <- cumsum(data3$fraction)
+
+# Compute the bottom of each rectangle
+data3$ymin <- c(0, head(data3$ymax, n=-1))
+
+# Compute label position
+data3$labelPosition <- (data3$ymax + data3$ymin) / 2
+
+# Compute a good label
+data3$label <- paste0(data3$category, "\n value: ", data3$count)
+
+# Make the plot
+myTable4 <- ggplot(data3, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
+  geom_rect() +
+  geom_text( x=2, aes(y=labelPosition, label=label, color=category), size=5) + # x here controls label position (inner / outer)
+  scale_fill_brewer(palette=10) +
+  scale_color_brewer(palette=10) +
+  coord_polar(theta="y") +
+  xlim(c(-1, 4)) +
+  theme_void() +
+  theme(legend.position = "none") +
+  ggtitle("What is your connection speed while taking online classes?")
+
+myTable4
+
 ```
 
 

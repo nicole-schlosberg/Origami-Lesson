@@ -1,0 +1,215 @@
+---
+title: "Origami Prediction"
+author: "Five Find Outers"
+output: html_document
+---
+```{r}
+library(caret)
+library(RWeka)
+library(tidyverse)
+library(GGally)
+library(lubridate)
+library(party)
+library(rpart)
+library(rpart.plot)
+```
+
+
+```{r}
+drop_out <- read.csv("Vidya data 1 - Sheet2.csv")
+```
+
+```{r}
+set.seed(1313)
+drop_out <- drop_out %>% mutate(TC_ID = as.factor(TC_ID), Gender = as.factor(Gender), Country = as.factor(Country), Weekly_academics = as.factor(Weekly_academics), Weekly_extracurriculars = as.factor(Weekly_extracurriculars), Technology = as.factor(Technology), Internet_speed = as.factor(Internet_speed), Enjoy_AC = as.factor(Enjoy_AC), Relaxing = as.factor(Relaxing), Instruction = as.factor(Instruction), Class.format = as.factor(Class.format), Completed = factor(Completed, levels = c("No", "Yes")), Take.online.class = factor(Take.online.class, levels = c("No","Yes")))
+```
+
+```{r}
+perc_75 <- (unique(drop_out$TC_ID) %>% length) * .75
+perc_75 <- perc_75 %>% round
+train_ids <- sample(unique(drop_out$TC_ID))[1:perc_75]
+drop_out <- drop_out %>% mutate(type = ifelse(TC_ID %in% train_ids, "train", "test"))
+drop_out_train <- drop_out %>% filter(type == "train") 
+drop_out_test <- drop_out %>% filter(type == "test") 
+```
+Using the CART Trees Model
+
+```{r}
+library(caret)
+TRAIN1 <- drop_out_train %>% select(-type)
+TRAIN2 <- TRAIN1[,c(2:13)]
+TEST1 <- drop_out_test[,c(2:13)]
+#Removing the Type and TC_ID columns
+```
+Prediction1 - Predicting the Completion of the Origami Class
+Training a basic model
+```{r}
+model1 <- rpart(Completed~., data = TRAIN2, control=rpart.control(minsplit=2, minbucket=1, cp=0.001))
+```
+```{r}
+par(xpd = NA) # Avoid clipping the text in some device
+plot(model1)
+text(model1, digits = 3)
+```
+Testing the model
+```{r}
+predicted.classes <- model1 %>% 
+  predict(TEST1, type = "class")
+head(predicted.classes)
+```
+```{r}
+mean(predicted.classes == TEST1$Completed)
+```
+The accuracy is 60%
+
+
+Training a fitted model
+```{r}
+
+MySummary  <- function(data, lev = NULL, model = NULL){
+  df <- defaultSummary(data, lev, model)
+  tc <- twoClassSummary(data, lev, model)
+  pr <- prSummary(data, lev, model)
+  out <- c(df,tc,pr)
+  out}
+
+ctrl <- trainControl(method = "repeatedcv", #Tell caret to perform k-fold cross validation
+                repeats = 3, #Tell caret to repeat each fold three times
+                classProbs = TRUE, #Calculate class probabilities
+                summaryFunction = MySummary)
+
+cartFit <- train(Completed ~., #Define which variable to predict 
+                data = TRAIN2, #Define the data set to train the model on
+                trControl = ctrl,
+                method = "rpart", #Define the model type
+                metric = "Accuracy", #Final model choice is made according to sensitivity
+                preProc = c("center", "scale")) #Center and scale the data to minimize the 
+```
+
+```{r}
+#Check the results
+cartFit$finalModel
+cartFit
+```
+Accuracy is 71.66%
+
+```{r}
+library(rpart.plot)
+rpart.plot(cartFit$finalModel)
+print(cartFit)
+```
+Testing the fitted model
+```{r setup, include=TRUE, cache = FALSE}
+library(caret)
+TEST1 <- drop_out_test[,c(2:13)] #Remove the student_id variable that we do not want to use in the model
+
+#Generate prediction using previously trained model
+cartClasses <- predict(cartFit,TEST1)
+
+#Generate model statistics
+confusionMatrix(data = cartClasses, as.factor(TEST1$Completed))
+```
+Accuracy is 60% as seen above, same as the basic model
+
+Prediction2 - Predicting the choosing of an online Origami Class
+Training a basic model
+```{r}
+TRAIN3 <- TRAIN1[,c(2:13)]
+#Removing the Type and TC_ID columns
+```
+```{r}
+model2 <- rpart(Take.online.class~., data = TRAIN2, control=rpart.control(minsplit=2, minbucket=1, cp=0.001))
+```
+```{r}
+par(xpd = NA) # Avoid clipping the text in some device
+plot(model2)
+text(model2, digits = 3)
+```
+Testing the basic model
+```{r}
+predicted.classes <- model2 %>% 
+  predict(TEST1, type = "class")
+head(predicted.classes)
+```
+```{r}
+mean(predicted.classes == TEST1$Take.online.class)
+```
+The accuracy is 80%
+
+Training a fitted model
+```{r}
+MySummary  <- function(data, lev = NULL, model = NULL){
+  df <- defaultSummary(data, lev, model)
+  tc <- twoClassSummary(data, lev, model)
+  pr <- prSummary(data, lev, model)
+  out <- c(df,tc,pr)
+  out}
+
+ctrl <- trainControl(method = "repeatedcv", #Tell caret to perform k-fold cross validation
+                repeats = 3, #Tell caret to repeat each fold three times
+                classProbs = TRUE, #Calculate class probabilities
+                summaryFunction = MySummary)
+
+cartFit1 <- train(Take.online.class ~., #Define which variable to predict 
+                data = TRAIN3, #Define the data set to train the model on
+                trControl = ctrl,
+                method = "rpart", #Define the model type
+                metric = "Accuracy", #Final model choice is made according to sensitivity
+                preProc = c("center", "scale")) #Center and scale the data to minimize the 
+```
+
+```{r}
+#Check the results
+cartFit1$finalModel
+print(cartFit1)
+rpart.plot(cartFit1$finalModel)
+```
+Testing the fitted model
+```{r}
+TEST1 <- drop_out_test[,c(2:13)]
+cartClasses1 <- predict(cartFit1,TEST1)
+```
+```{r}
+#Generate model statistics
+confusionMatrix(data = cartClasses1, as.factor(TEST1$Take.online.class))
+```
+The accuracy is the same, at 80%
+
+
+
+Conditional Inference trees
+Prediction1 - Predicting the Completion of the Origami Class
+```{r}
+library(party)
+```
+Training a Conditional Inference Tree model
+```{r}
+condFit <- ctree(Completed~., TRAIN2)
+plot(condFit, tp_args = list(beside = TRUE))
+condFit
+```
+Testing the model
+```{r}
+condClasses <- predict(condFit, newdata = TEST1)
+
+ #Generate model statistics
+ confusionMatrix(data = condClasses, as.factor(TEST1$Completed))
+```
+The accuracy is 60%
+
+Prediction2 - Predicting students taking online classes for Origami
+Training a Conditional Inference Model
+```{r}
+condFit1 <- ctree(Take.online.class~., TRAIN2)
+plot(condFit1, tp_args = list(beside = TRUE))
+condFit1
+```
+Testing the model
+```{r}
+condClasses1 <- predict(condFit1, newdata = TEST1)
+
+ #Generate model statistics
+ confusionMatrix(data = condClasses1, as.factor(TEST1$Take.online.class))
+```
+The accuracy is noted at 80%
+
