@@ -119,40 +119,6 @@ myTable3 <- ggplot(data2, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=categor
 
 myTable3
 
-data4 <- data.frame(
-  category=c("I love it!", "Dont","Im Alright", "3-5 a year"),
-  count=c(12, 1, 8, 1)
-)
- 
-# Compute percentages
-data4$fraction <- data4$count / sum(data4$count)
-
-# Compute the cumulative percentages (top of each rectangle)
-data4$ymax <- cumsum(data4$fraction)
-
-# Compute the bottom of each rectangle
-data4$ymin <- c(0, head(data4$ymax, n=-1))
-
-# Compute label position
-#data4$labelPosition <- (data3$ymax + data4$ymin) / 2
-
-# Compute a good label
-data4$label <- paste0(data4$category, "\n value: ", data4$count)
-
-# Make the plot
-myTable5 <- ggplot(data4, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
-  geom_rect() +
-  geom_text( x=2, aes(y=labelPosition, label=label, color=category), size=5) + # x here controls label position (inner / outer)
-  scale_fill_brewer(palette=11) +
-  scale_color_brewer(palette=11) +
-  coord_polar(theta="y") +
-  xlim(c(-1, 4)) +
-  theme_void() +
-  theme(legend.position = "none") +
-  ggtitle("Do you enjoy arts and crafts activities?")
-
-myTable5
-
 data3 <-   data.frame(
   category=c("Lightening Speed", "Fast","Moderate"),
   count=c(2, 12, 8)
@@ -186,6 +152,41 @@ myTable4 <- ggplot(data3, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=categor
   ggtitle("What is your connection speed while taking online classes?")
 
 myTable4
+
+data4 <- data.frame(
+  category=c("I love it!", "Dont","Im Alright", "3-5 a year"),
+  count=c(12, 1, 8, 1)
+)
+ 
+# Compute percentages
+data4$fraction <- data4$count / sum(data4$count)
+
+# Compute the cumulative percentages (top of each rectangle)
+data4$ymax <- cumsum(data4$fraction)
+
+# Compute the bottom of each rectangle
+data4$ymin <- c(0, head(data4$ymax, n=-1))
+
+# Compute label position
+data4$labelPosition <- (data4$ymax + data4$ymin) / 2
+
+# Compute a good label
+data4$label <- paste0(data4$category, "\n value: ", data4$count)
+
+
+# Make the plot
+myTable5 <- ggplot(data4, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
+  geom_rect() +
+  geom_text( x=2, aes(y=labelPosition, label=label, color=category), size=5) + # x here controls label position (inner / outer)
+  scale_fill_brewer(palette=11) +
+  scale_color_brewer(palette=11) +
+  coord_polar(theta="y") +
+  xlim(c(-1, 4)) +
+  theme_void() +
+  theme(legend.position = "none") +
+  ggtitle("Do you enjoy arts and crafts activities?")
+
+myTable5
 
 ```
 
@@ -222,7 +223,9 @@ tags$p("Here are our findings."),
           tabPanel("Demographics",
                    plotOutput("demo"),
                    plotOutput("pie"),
-                   plotOutput("pie2")
+                   plotOutput("pie2"),
+                   plotOutput("pie3"),
+                   plotOutput("pie4")
           ),
           tabPanel("Predictions", htmlOutput("pred"))
           )
@@ -242,6 +245,14 @@ server <- function(input, output) {
     
     output$pie2 <- renderPlot({
       myTable3
+    })
+    
+    output$pie3 <- renderPlot({
+      myTable4
+    })
+    
+    output$pie4 <- renderPlot({
+      myTable5
     })
     
     getPage<-function() {
