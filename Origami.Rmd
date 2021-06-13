@@ -15,8 +15,10 @@ origamiSurvey <- read.csv("OrigamiSurveyUpdate.csv")
 
 #remove unwanted rows
 origamiSurvey<-select(origamiSurvey, 1:20)
+
 #rename columns
 colnames(origamiSurvey) <- c("timestamp", "id", "gender", "countryIn", "HoursPerWeekStudying", "HoursPerWeekExtracurriculars", "technology", "internetSpeed", "enjoyArtsAndCrafts", "findsOrigamiRelaxing", "engagingLesson", "aDifferentFormat", "clearInstructions", "motivation", "completionToWhere", "whyStopped", "bestFormat", "reasonsNotToTake", "butterfly", "frog")
+
 #Make all the Countries the same (capitals and spelling)
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "U.S", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "USA.", "US")
@@ -24,10 +26,13 @@ origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "USA", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "US.", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "United States", "US")
 origamiSurvey$countryIn <- str_to_upper(origamiSurvey$countryIn)
+
 #Fill in Unknown for students who did not share their country
 origamiSurvey[1,4] <- "Unknown"
+
 #remove the timestamp
 origamiSurvey <- origamiSurvey[,-1]
+
 #Make all the Internet Speeds simpler
 origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Fast. Enough to smoothly  stream video, quickly download large files, etc.", "Fast")
 origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Lightning Speed. Fastest possible connection for all sorts of projects and activities.", "Lightning Speed")
@@ -134,7 +139,7 @@ data4$ymax <- cumsum(data4$fraction)
 data4$ymin <- c(0, head(data4$ymax, n=-1))
 
 # Compute label position
-#data4$labelPosition <- (data3$ymax + data4$ymin) / 2
+data4$labelPosition <- (data3$ymax + data4$ymin) / 2
 
 # Compute a good label
 data4$label <- paste0(data4$category, "\n value: ", data4$count)
@@ -152,6 +157,8 @@ myTable5 <- ggplot(data4, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=categor
   ggtitle("Do you enjoy arts and crafts activities?")
 
 myTable5
+
+
 
 data3 <-   data.frame(
   category=c("Lightening Speed", "Fast","Moderate"),
@@ -222,7 +229,9 @@ tags$p("Here are our findings."),
           tabPanel("Demographics",
                    plotOutput("demo"),
                    plotOutput("pie"),
-                   plotOutput("pie2")
+                   plotOutput("pie2"),
+                   plotOutput("pie3"),
+                   plotOutput("pie4")
           ),
           tabPanel("Predictions", htmlOutput("pred"))
           )
@@ -242,6 +251,14 @@ server <- function(input, output) {
     
     output$pie2 <- renderPlot({
       myTable3
+    })
+    
+    output$pie3 <- renderPlot({
+      myTable4
+    })
+    
+    output$pie4 <- renderPlot({
+      myTable5
     })
     
     getPage<-function() {
