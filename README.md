@@ -1,8 +1,15 @@
 # Origami-Lesson
 
-OrigamiSurvey.csv is the data downloaded from the Google Survey.   
-OrigamiSurveyUpdate.csv is the data but with the frog and butterfly columns updated  
-Origami.Rmd cleans the data and begins building the shiny app  
+We taught a synchronous origami lesson to our Feature Engineering Studio class. We were interested in seeing how a mechanical skill could be taught online and whether students would be engaged in completing the task and their overall interest and success. We explored our data through basic demographic information and asking whether the students even like working on hobbies such as origami, which we deployed in our Shiny App. This information can be found in the first tab of our Shiny App. Then we created a prediction model for several factors, which we also included in the Shiny App as a html output of the RMarkdown where we evaluated the data.
+
+# Files  
+
+* Origami.Rmd cleans the data, creates our graphs for the Shiny App, and executes the building of the Shiny App.    
+* Origami_Prediction.Rmd calculates our predictions holds our decision tree algorithm (basics and visual representations): The algorithm of decision tree models works by repeatedly partitioning the data into multiple sub-spaces, so that the outcomes in each final sub-space is as homogeneous as possible. This approach is technically called recursive partitioning. This Rmd holds output you will see the entire process of data wrangling, analysis, and modeling results.   
+* Origami_Prediction.html is the html output of Origami_Prediction.Rmd that will be called into the Shiny App.  
+* OrigamiShiny Folder holds the Origami.R and Origami_Prediction.html that launch our Shiny App.    
+* OrigamiSurvey.csv is the data downloaded from the Google Survey.   
+* OrigamiSurveyUpdate.csv is the data but with the frog and butterfly columns updated.   
 
 # Codebook
 
