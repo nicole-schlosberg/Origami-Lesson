@@ -7,7 +7,6 @@
 #    http://shiny.rstudio.com/
 #
 
-#Creating our shiny app 
 library(shiny)
 
 #Two tabs: 1. Demographics and 2. Predictions
@@ -37,7 +36,9 @@ ui <- fluidPage(
                 tabPanel("Demographics",
                          plotOutput("demo"),
                          plotOutput("pie"),
-                         plotOutput("pie2")
+                         plotOutput("pie2"),
+                         plotOutput("pie3"),
+                         plotOutput("pie4")
                 ),
                 tabPanel("Predictions", htmlOutput("pred"))
             )
@@ -57,6 +58,14 @@ server <- function(input, output) {
     
     output$pie2 <- renderPlot({
         myTable3
+    })
+    
+    output$pie3 <- renderPlot({
+        myTable4
+    })
+    
+    output$pie4 <- renderPlot({
+        myTable5
     })
     
     getPage<-function() {

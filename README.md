@@ -4,7 +4,7 @@ We taught a synchronous origami lesson to our Feature Engineering Studio class. 
 
 # Files  
 
-* Origami.Rmd cleans the data, creates our graphs for the Shiny App, and executes the building of the Shiny App.    
+* Origami.Rmd cleans the data, creates our graphs, and begins the building of the Shiny App. **Must execute cleaning and graphs code before launching the shiny app**       
 * Origami_Prediction.Rmd calculates our predictions holds our decision tree algorithm (basics and visual representations): The algorithm of decision tree models works by repeatedly partitioning the data into multiple sub-spaces, so that the outcomes in each final sub-space is as homogeneous as possible. This approach is technically called recursive partitioning. This Rmd holds output you will see the entire process of data wrangling, analysis, and modeling results.   
 * Origami_Prediction.html is the html output of Origami_Prediction.Rmd that will be called into the Shiny App.  
 * OrigamiShiny Folder holds the Origami.R and Origami_Prediction.html that launch our Shiny App.    

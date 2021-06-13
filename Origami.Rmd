@@ -173,7 +173,6 @@ data4$labelPosition <- (data4$ymax + data4$ymin) / 2
 # Compute a good label
 data4$label <- paste0(data4$category, "\n value: ", data4$count)
 
-
 # Make the plot
 myTable5 <- ggplot(data4, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category)) +
   geom_rect() +
@@ -187,7 +186,6 @@ myTable5 <- ggplot(data4, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=categor
   ggtitle("Do you enjoy arts and crafts activities?")
 
 myTable5
-
 ```
 
 
