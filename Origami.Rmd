@@ -24,113 +24,22 @@ origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "USA", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "US.", "US")
 origamiSurvey <- origamiSurvey %>% mutate_at(4, str_replace_all, "United States", "US")
 origamiSurvey$countryIn <- str_to_upper(origamiSurvey$countryIn)
+#Fill in Unknown for students who did not share their country
+origamiSurvey[1,4] <- "Unknown"
 #remove the timestamp
 origamiSurvey <- origamiSurvey[,-1]
 #Make all the Internet Speeds simpler
 origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Fast. Enough to smoothly  stream video, quickly download large files, etc.", "Fast")
 origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Lightning Speed. Fastest possible connection for all sorts of projects and activities.", "Lightning Speed")
 origamiSurvey <- origamiSurvey %>% mutate_at(7, str_replace_all, "Moderate. Enough to get online, checkin, and comfortably browse the web.", "Moderate")
+
 ```
 
 
-#Creating Interactive Visualization
-
-#https://shiny.rstudio.com/reference/shiny/latest/tabsetPanel.html
-```{r}
-#install.packages("shinydashboard")
-library(shiny)
-library(shinydashboard)
-library(ggplot2)
-
-#Two tabs: 1. Demographics and 2. Predictions
-#1. Demographics data (holds all the graphs to display country, gender, and if got correct?)
-#2. tab set up for prediction (calling this dataset pred for now but change based on true name)
-#3. How was the lesson
-
-ui <- fluidPage(
-  title = "Origami Data",
-tags$h2("Five Find-Outers: Origami Lesson Analysis. How did it go?"),
-tags$p("After our online lesson, we decided to use shiny as a platform to show the class the results of the information we were able to gather."),
-  sidebarLayout(
-    sidebarPanel(
-      #1. Demographics data
-      conditionalPanel( 
-        'input.data === "Demographics"',
-        helpText("
-        Whats all the fuzz about? - As an educational excersise, we decided to teach to our fellow classmate a class of origami in oder to evaluate how 'teachable' this particular skills are in the context of online education.This section contains some relevant information on the people that participated in our class")
-      ),
-      #2. tab set up for prediction
-      conditionalPanel( 
-        'input.data === "Predictions"',
-        helpText("Decision tree algorithm:
-Basics and visual representation .-
-The algorithm of decision tree models works by repeatedly partitioning the data into multiple sub-spaces, so that the outcomes in each final sub-space is as homogeneous as possible. This approach is technically called recursive partitioning.In the following Rmarkdown you will see the entire process of data wrangling, analysis and models outcome.")
-      ),
-      #3. How was the lesson
-      conditionalPanel( 
-        'input.data === "Summary"',
-        helpText("How Was The Lesson?")
-      )
-    ),
-    mainPanel(
-      tabsetPanel(
-        id = 'data',
-          tabPanel("Demographics",
-                   plotOutput("demo"),
-                   plotOutput("pie"),
-                   plotOutput("pie2"),
-                   plotOutput("pie3"),
-                   plotOutput("pie4")
-),
-          tabPanel("Predictions", htmlOutput("rmark")),
-          tabPanel("Summary",plotOutput("sum"))
-      )
-    )
-    )
-)
-
-server <- function(input, output) {
-  getPage<-function() {
-    return(includeHTML("Origami_Prediction.html"))
-  }
-  
-  output$rmark<-renderUI({getPage()})
-  
-  output$demo <- renderPlot({
-    mytable1
-
-  })
-  
-    output$pie <- renderPlot({
-    myTable2
-
-  })
-    
-        output$pie2 <- renderPlot({
-    myTable3
-
-  })
-        
-        output$pie3 <- renderPlot({
-    myTable4
-
-  })
-       output$pie4 <- renderPlot({
-    myTable5
-
-  })
-  
-  output$pred <- renderPlot({
-  })
-}
-
-shinyApp(ui, server)
-```
-
-
-#Making graphs
+#Making graphs that will be used in the shiny app
 ```{r}
 library(tidyverse)
+library(ggplot2)
 
 #first table
 p <- ggplot(origamiSurvey,aes(fill=gender,
@@ -139,16 +48,13 @@ p <- ggplot(origamiSurvey,aes(fill=gender,
   ggtitle("Where is our class and how is it composed?")
 
 mytable1 <- p + coord_flip()
-
 mytable1
-
 
 # Create test data.
 data <- data.frame(
   category=c("+15 hours", "10-15 hours","5-10 hours", "0-5 hours"),
   count=c(6, 7, 3, 6)
 )
- 
  
 # Compute percentages
 data$fraction <- data$count / sum(data$count)
@@ -177,16 +83,13 @@ myTable2 <- ggplot(data, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=category
   theme(legend.position = "none") +
   ggtitle("On average, how many hours do you spend on your academic per week?")
 
-
 myTable2
-
 
 data2 <- data.frame(
   category=c("+15 hours", "10-15 hours","5-10 hours", "0-5 hours"),
   count=c(6, 3, 6, 7)
 )
  
-
 # Compute percentages
 data2$fraction <- data2$count / sum(data2$count)
 
@@ -221,8 +124,6 @@ data4 <- data.frame(
   count=c(12, 1, 8, 1)
 )
  
- 
-
 # Compute percentages
 data4$fraction <- data4$count / sum(data4$count)
 
@@ -233,7 +134,7 @@ data4$ymax <- cumsum(data4$fraction)
 data4$ymin <- c(0, head(data4$ymax, n=-1))
 
 # Compute label position
-data4$labelPosition <- (data3$ymax + data4$ymin) / 2
+#data4$labelPosition <- (data3$ymax + data4$ymin) / 2
 
 # Compute a good label
 data4$label <- paste0(data4$category, "\n value: ", data4$count)
@@ -257,7 +158,6 @@ data3 <-   data.frame(
   count=c(2, 12, 8)
 )
  
-
 # Compute percentages
 data3$fraction <- data3$count / sum(data3$count)
 
@@ -290,127 +190,74 @@ myTable4
 ```
 
 
-
-
-
-
-#Below is testing code ignore
-
-#Testing using a dashboard to have tabs
-```{r}
- library(shiny)
- library(bs4Dash)
-
-   ui <- dashboardPage(
-    header = dashboardHeader("Origami Data"),
-    sidebar = dashboardSidebar(),
-    controlbar = dashboardControlbar(),
-    footer = dashboardFooter("Five Find-Outers: Origami Lesson Analysis. How did it go?"),
-    title = "Origami Data",
-    body = dashboardBody(
-     # manually inserted panels
-     tabsetPanel(
-      id = "tabcard",
-      tabPanel(
-       title = "Demographics", 
-       plotOutput("demo")
-      ),
-      tabPanel(
-       title = "Predictions", 
-       tableOutput("pred")
-      )
-     
-      )
-    )
-   )
-   server = function(input, output) {
-    
-   observeEvent(input$plot, {
-     tabsetPanel(
-       inputId = "plot", output$renderPlot
-     )
-   })
-   
-   observeEvent(input$table, {
-     updateTabsetPanel(
-       session, 
-       inputId = "table", 
-     )
-   })
-  
-   }
- shinyApp(ui, server)
-```
-
-#https://github.com/rstudio/shiny
-#Do not use this one
+#Creating our shiny app 
 ```{r}
 library(shiny)
-library(ggplot2)
+
 
 #Two tabs: 1. Demographics and 2. Predictions
-#1. Demographics data (holds all the graphs to display country, gender, and if got correct?)
-#2. tab set up for prediction (calling this dataset pred for now but change based on true name)
-#3. How was the lesson
+#1. Demographics data 
+#2. tab set up for prediction 
 
 ui <- fluidPage(
   title = "Origami Data",
-tags$h2("Five Find-Outers: Origami Lesson Analysis. How did it go?"),
-tags$p("After our online lesson, we decided to use shiny as a platform to show the class the results of the information we were able to gather."),
+tags$h2("Origami Lesson Analysis by the Five Find-Outers: "),
+tags$p("Here are our findings."),
   sidebarLayout(
     sidebarPanel(
       #1. Demographics data
       conditionalPanel( 
-        'input.dataset === "Demographics"',
-        checkboxGroupInput("demo", "Select What You Would Like To See",
-                           names(origamiSurvey[,-c(8:17)]), selected = NA)
+        'input.data === "Demographics"',
+        helpText("Here we presented the relevant information on the break down on the classmates that participated in our synchronous origami lesson.")
       ),
       #2. tab set up for prediction
       conditionalPanel( 
-        'input.dataset === "Predictions"',
-        helpText("Here are our predictions")
-      ),
-      #3. How was the lesson
-      conditionalPanel( 
-        'input.dataset === "Summary"',
-        checkboxGroupInput("Summary", "How Was The Lesson?",
-                           names(origamiSurvey[,c(8:19)]), selected = NA)
+        'input.data === "Predictions"',
+        helpText("Decision tree algorithm - Basics and visual representation: The algorithm of decision tree models works by repeatedly partitioning the data into multiple sub-spaces, so that the outcomes in each final sub-space is as homogeneous as possible. This approach is technically called recursive partitioning. In the following html output you will see the entire process of data wrangling, analysis, and modeling results")
       )
     ),
-    
     mainPanel(
       tabsetPanel(
-        id = 'dataset',
-        #1. What the output for demographics tab will be (should change from table) also might nest in more graphs to this tab -- look into how to do that
-        tabPanel("Demographics", DT::dataTableOutput("mytable1")), 
-        #2. What the output for prediction tab will be (might want to use the table)
-        tabPanel("Predictions", DT::dataTableOutput("mytable2")),
-        #3. What the output for lesson rating tab will be (some form of graphs--same as demo tab)
-        tabPanel("Summary", verbatimTextOutput("summary"))
+        id = 'data',
+          tabPanel("Demographics",
+                   plotOutput("demo"),
+                   plotOutput("pie"),
+                   plotOutput("pie2")
+          ),
+          tabPanel("Predictions", htmlOutput("pred"))
+          )
       )
     )
-  )
 )
 
 server <- function(input, output) {
-
-  #1. Output for demographics tab
-  output$mytable1 <- DT::renderDataTable({ #should change from table output based on tabPanel
-    DT::datatable(origamiSurvey[, input$demo, drop = FALSE])
-  })
   
-  #2. Output for prediction tab
-  output$mytable2 <- DT::renderDataTable({
-    DT::datatable(pred, options = list(orderClasses = TRUE)) #pred = whatever dataset we use
-  })
+    output$demo <- renderPlot({
+      mytable1
+    })
   
-  #3. Output for ratings tab
-  output$mytable3 <- DT::renderDataTable({ #should change from table output based on tabPanel
-    DT::datatable(origamiSurvey[, input$rate, drop = FALSE])
-  })
+    output$pie <- renderPlot({
+      myTable2
+    })
+    
+    output$pie2 <- renderPlot({
+      myTable3
+    })
+    
+    getPage<-function() {
+      return(includeHTML("Origami_Prediction.html"))
+    }
+    output$pred<-renderUI({getPage()})
 }
 
 shinyApp(ui, server)
 ```
+
+
+
+
+
+
+
 
 
