@@ -5,16 +5,16 @@ We taught a synchronous origami lesson to our Feature Engineering Studio class. 
 
 ## Data Analysis
 
-* Demographics
-**Relevant information on the break down on the classmates that participated in our synchronous origami lesson.  
+### Demographics
+* Relevant information on the break down on the classmates that participated in our synchronous origami lesson.  
 ![](1.png)  
 ![](2.png) 
 ![](3.png) 
 ![](4.png) 
 ![](5.png) 
 
-* Predictions
-**Decision tree algorithm - Basics and visual representation: The algorithm of decision tree models works by repeatedly partitioning the data into multiple sub-spaces, so that the outcomes in each final sub-space is as homogeneous as possible. This approach is technically called recursive partitioning. In the html output you will see the entire process of data wrangling, analysis, and modeling results. 
+### Predictions
+* Decision tree algorithm - Basics and visual representation: The algorithm of decision tree models works by repeatedly partitioning the data into multiple sub-spaces, so that the outcomes in each final sub-space is as homogeneous as possible. This approach is technically called recursive partitioning. In the html output you will see the entire process of data wrangling, analysis, and modeling results. 
 
 
 ## ShinyApp
