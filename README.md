@@ -19,8 +19,8 @@ We taught a synchronous origami lesson to our Feature Engineering Studio class. 
 
 ## ShinyApp
 
-* Created a ShinyApp that contains the data analysis of the Origami Lesson Data.
-![](ShinyVideo.mov) 
+* Created a ShinyApp that contains the data analysis of the Origami Lesson Data  
+![ShineyVideo](ShinyVideo.mov)  
 
 
 # Files  
