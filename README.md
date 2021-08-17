@@ -2,6 +2,27 @@
 
 We taught a synchronous origami lesson to our Feature Engineering Studio class. We were interested in seeing how a mechanical skill could be taught online and whether students would be engaged in completing the task and their overall interest and success. We explored our data through basic demographic information and asking whether the students even like working on hobbies such as origami, which we deployed in our Shiny App. This information can be found in the first tab of our Shiny App. Then we created a prediction model for several factors, which we also included in the Shiny App as a html output of the RMarkdown where we evaluated the data.
 
+
+## Data Analysis
+
+* Demographics
+**Relevant information on the break down on the classmates that participated in our synchronous origami lesson.  
+![](1.png)  
+![](2.png) 
+![](3.png) 
+![](4.png) 
+![](5.png) 
+
+* Predictions
+**Decision tree algorithm - Basics and visual representation: The algorithm of decision tree models works by repeatedly partitioning the data into multiple sub-spaces, so that the outcomes in each final sub-space is as homogeneous as possible. This approach is technically called recursive partitioning. In the html output you will see the entire process of data wrangling, analysis, and modeling results. 
+
+
+## ShinyApp
+
+* Created a ShinyApp that contains the data analysis of the Origami Lesson Data.
+![](ShinyVideo.mov) 
+
+
 # Files  
 
 * Origami.Rmd cleans the data, creates our graphs, and begins the building of the Shiny App. **Must execute cleaning and graphs code before launching the shiny app**       
